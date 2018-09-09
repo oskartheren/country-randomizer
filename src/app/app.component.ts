@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HostListener } from '@angular/core';
-import { COUNTRIES } from './countries';
+import { PLACES } from './places';
+import { IS_PNG } from './places';
 
 @Component({
   selector: 'app-root',
@@ -8,37 +9,71 @@ import { COUNTRIES } from './countries';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  country: string;
-  contries = COUNTRIES;
+  isBig = false;
+  isLooping = false;
 
   constructor() {
-    this.country = '------';
-    // window.onload = function() { markMap(); }
-  }
-  markMap = function() {
-    var canvas = <HTMLCanvasElement>document.getElementById("myCanvas");
-    var ctx = canvas.getContext("2d");
-    var map = new Image();
-    map.src = '../assets/WorldMap.png';
-    ctx.drawImage(map, 0, 0, canvas.width, canvas.height);
-    ctx.beginPath();
-    ctx.arc(canvas.width * Math.random(), canvas.height * Math.random(), 10, 0, 2 * Math.PI, false);
-    ctx.fillStyle = 'green';
-    ctx.fill();
-    ctx.stroke();
+    this.drawPlaces();
   }
 
-  generateCountry = function() {
-    this.country = COUNTRIES[Math.floor(Math.random() * COUNTRIES.length)];
-    this.markMap();
-  }
-  onSearchChange = function() {
-    alert("HEJ")
-  }
+  drawPlaces = function() {
+    const images = [];
+    for (let i = 0; i < PLACES.length; i++) {
+      const place = new Image(window.innerWidth / 8, window.innerHeight / 5);
+      place.src = '../assets/' + PLACES[i];
+      if (IS_PNG[i]) {
+        place.src += '.png';
+      } else {
+        place.src += '.jpg';
+      }
+      images.push(place);
+    }
+    window.onload = function() {
+      for (const image of images) {
+        const imageDiv = document.getElementById('images');
+        imageDiv.appendChild(image);
+      }
+    };
+  };
+
+  showPlace = function(place: string) {
+    const image = <HTMLImageElement>document.getElementById('bigImage');
+    const index = PLACES.indexOf(place);
+    image.src = '../assets/' + place;
+    if (IS_PNG[index]) {
+      image.src += '.png';
+    } else {
+      image.src += '.jpg';
+    }
+    this.setBig(image, 1, 30, this);
+  };
+  generatePlace = function() {
+    this.place = PLACES[Math.floor(Math.random() * PLACES.length)];
+    this.showPlace(this.place);
+  };
+
+  setBig = function(image, multiplier, loops, scope) {
+     setTimeout(function () {
+       image.width += multiplier * ( window.innerWidth / 30);
+       image.height += multiplier * ( window.innerHeight / 30);
+       if (--loops) { scope.setBig(image, multiplier, loops, scope); }
+       if (loops === 0 ) {scope.isLooping = false; }
+    }, 10);
+  };
+
   @HostListener('window:keyup', ['$event'])
   keyEvent(event: KeyboardEvent) {
-    if (event.keyCode == 32) {
-      this.generateCountry();
+    if (event.keyCode === 32) {
+      if (!this.isLooping) {
+        this.isLooping = true;
+        if (this.isBig) {
+          this.generatePlace();
+        } else {
+          const image = <HTMLImageElement>document.getElementById('bigImage');
+          this.setBig(image, -1, 30, this);
+        }
+        this.isBig = !this.isBig;
+      }
     }
   }
 }
