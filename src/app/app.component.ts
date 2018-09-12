@@ -19,13 +19,19 @@ export class AppComponent {
   drawPlaces = function() {
     const images = [];
     for (let i = 0; i < PLACES.length; i++) {
-      const place = new Image(window.innerWidth / 8, window.innerHeight / 5);
+      // const place = new Image(window.innerWidth / 8, window.innerHeight / 5);
+      const place = new Image();
+      place.classList.add('img-thumbnail');
       place.src = '../assets/' + PLACES[i];
       if (IS_PNG[i]) {
         place.src += '.png';
       } else {
         place.src += '.jpg';
       }
+      const scaling = 120 / place.height;
+      place.width = Math.round(place.width *  scaling);
+      place.height = Math.round(place.height * scaling);
+      place.classList.add('rounded');
       images.push(place);
     }
     window.onload = function() {

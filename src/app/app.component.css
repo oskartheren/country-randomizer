@@ -2,7 +2,11 @@
   position: absolute;
   margin:auto;
   top:0;right:0;bottom:0;left:0;
+   margin-top:200px; /*to have the space above the image*/
+   margin-bottom:200px; /*to have the space under the image*/
 }
 h1 {
     font-family: Arial, Helvetica, sans-serif;
+}
+{
 }
